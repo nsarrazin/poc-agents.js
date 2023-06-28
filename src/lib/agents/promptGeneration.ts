@@ -1,39 +1,39 @@
-import type { Tool } from './tools/tool';
+import type { Tool } from "./tools/tool";
 
 function toolDescription(tool: Tool<any, any>) {
-	let prompt = `	name: ${tool.name} \n	description: ${tool.description}`;
+  let prompt = `	name: ${tool.name} \n	description: ${tool.description}`;
 
-	const examples = tool.examples.slice(0, 1).map((example) => {
-		return `	prompt: ${example.prompt} \n	command generated: \`${example.command}\``;
-	});
+  const examples = tool.examples.slice(0, 1).map((example) => {
+    return `	prompt: ${example.prompt} \n	command generated: \`${example.command}\``;
+  });
 
-	prompt += `\n` + examples.join('\n');
+  prompt += `\n` + examples.join("\n");
 
-	return prompt;
+  return prompt;
 }
 
 export function generatePrompt(
-	prompt: string,
-	tools: Tool<any, any>[],
-	image?: boolean,
-	audio?: boolean
+  prompt: string,
+  tools: Tool<any, any>[],
+  image?: boolean,
+  audio?: boolean
 ) {
-	if (tools.length === 0) {
-		throw new Error('no tools selected');
-	}
+  if (tools.length === 0) {
+    throw new Error("no tools selected");
+  }
 
-	let params = '';
+  let params = "";
 
-	if (image) {
-		params += `image`;
-	}
-	if (audio) {
-		params += params ? ',' : '';
-		params += `audio`;
-	}
+  if (image) {
+    params += `image`;
+  }
+  if (audio) {
+    params += params ? "," : "";
+    params += `audio`;
+  }
 
-	// describe all the tools
-	const fullPrompt = `
+  // describe all the tools
+  const fullPrompt = `
 Create a function that does the following: ${prompt}. 
 
 Examples:
@@ -68,7 +68,7 @@ async function generate(audio) {
 \`\`\`
 
 In order to help in answering the above prompt, the function has access to the following methods to generate outputs.
-${tools.map((tool) => toolDescription(tool)).join('\n\n ')}
+${tools.map((tool) => toolDescription(tool)).join("\n\n ")}
 
 Use the above methods and only the above methods to answer the prompt: ${prompt}.
 
@@ -80,5 +80,5 @@ return output;
 };
 \`\`\``;
 
-	return fullPrompt;
+  return fullPrompt;
 }
