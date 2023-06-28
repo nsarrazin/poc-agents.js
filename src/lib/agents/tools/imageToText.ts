@@ -3,7 +3,7 @@ import type {
   ImageToTextArgs,
   ImageToTextOutput,
 } from "@huggingface/inference";
-import type { Tool } from "./tool";
+import type { Tool } from "$lib/types";
 
 export const imageToTextTool: Tool<
   ImageToTextArgs["data"],

@@ -4,7 +4,7 @@ import type {
   TextToSpeechOutput,
 } from "@huggingface/inference";
 
-import type { Tool } from "./tool";
+import type { Tool } from "$lib/types";
 
 export const textToSpeechTool: Tool<
   TextToSpeechArgs["inputs"],

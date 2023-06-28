@@ -1,4 +1,4 @@
-import type { Tool } from "./tools/tool";
+import type { Tool } from "$lib/types";
 
 function toolDescription(tool: Tool<any, any>) {
   let prompt = `	name: ${tool.name} \n	description: ${tool.description}`;
@@ -67,6 +67,8 @@ async function generate(audio) {
 }
 \`\`\`
 
+If you need to send information use \`message("message", data)\` and NOT \`console.log\`.
+
 In order to help in answering the above prompt, the function has access to the following methods to generate outputs.
 ${tools.map((tool) => toolDescription(tool)).join("\n\n ")}
 
@@ -79,6 +81,5 @@ async function generate(${params}}) {
 return output;
 };
 \`\`\``;
-
   return fullPrompt;
 }

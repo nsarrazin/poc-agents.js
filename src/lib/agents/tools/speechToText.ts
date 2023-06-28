@@ -3,7 +3,7 @@ import type {
   AutomaticSpeechRecognitionArgs,
   AutomaticSpeechRecognitionOutput,
 } from "@huggingface/inference";
-import type { Tool } from "./tool";
+import type { Tool } from "$lib/types";
 
 export const speechToTextTool: Tool<
   AutomaticSpeechRecognitionArgs["data"],

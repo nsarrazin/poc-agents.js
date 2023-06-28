@@ -1,4 +1,4 @@
-import type { Tool } from "./tool";
+import type { Tool } from "$lib/types";
 
 export const messageTool: Tool<Promise<Blob | string> | string, void> = {
   name: "message",
