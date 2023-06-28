@@ -4,7 +4,7 @@
 	import { tools } from '$lib/agents/tools';
 	import { evalBuilder } from '$lib/agents/evalBuilder';
 
-	let prompt = 'Draw a picture of a brown dog. Then caption the picture and read it out loud.';
+	let prompt = 'Draw a picture of a cat wearing a top hat. Then caption the picture and read it out loud.';
 	let selectedTools: Array<string> = [];
 	let codePromise: Promise<string> | null = null;
 	let messages: Array<{ message: string; data: string | Blob | undefined }> = [];
