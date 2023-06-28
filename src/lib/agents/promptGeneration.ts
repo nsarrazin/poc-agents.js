@@ -1,10 +1,10 @@
 import type { Tool } from "$lib/types";
 
 function toolDescription(tool: Tool<any, any>) {
-  let prompt = `	name: ${tool.name} \n	description: ${tool.description}`;
+  let prompt = `name: ${tool.name} \ndescription: ${tool.description}`;
 
   const examples = tool.examples.slice(0, 1).map((example) => {
-    return `	prompt: ${example.prompt} \n	command generated: \`${example.command}\``;
+    return `prompt: ${example.prompt} \ncommand generated: \`${example.command}\``;
   });
 
   prompt += `\n` + examples.join("\n");
@@ -34,9 +34,15 @@ export function generatePrompt(
 
   // describe all the tools
   const fullPrompt = `
-Create a function that does the following: ${prompt}. 
+Create a javascript function that does the following: "${prompt}" 
+
+If you need to send information use \`message("message", data)\` and NOT \`console.log\`.
+
+In order to help in answering the above prompt, the function has access to the following methods to generate outputs.
+${tools.map((tool) => toolDescription(tool)).join("\n-------\n")}
 
 Examples:
+
 For the prompt: "Caption the image and give me the caption read out loud."
 \`\`\`js
 async function generate(image) {
@@ -66,11 +72,6 @@ async function generate(audio) {
 	return output;
 }
 \`\`\`
-
-If you need to send information use \`message("message", data)\` and NOT \`console.log\`.
-
-In order to help in answering the above prompt, the function has access to the following methods to generate outputs.
-${tools.map((tool) => toolDescription(tool)).join("\n\n ")}
 
 Use the above methods and only the above methods to answer the prompt: ${prompt}.
 

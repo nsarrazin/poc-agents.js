@@ -23,19 +23,19 @@ async function OpenAILLMCall(prompt: string) {
 async function HFLLMCall(prompt: string) {
   const hf = getInference();
 
-  const formattedPrompt = "<|user|>" + prompt + "<end|><|assistant|>";
+  const formattedPrompt = "<|user|>" + prompt + "<|end|>";
 
-  const textAnswer = await hf.textGeneration({
+  const generatedOutput = await hf.textGeneration({
     inputs: formattedPrompt,
-    model: "HuggingFaceH4/starchat-beta",
+    model: "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
     parameters: {
-      max_new_tokens: 1024,
+      max_new_tokens: 512,
     },
   });
 
-  console.log(textAnswer.generated_text);
+  const text = generatedOutput.generated_text.slice(formattedPrompt.length);
 
-  return textAnswer.generated_text;
+  return text;
 }
 
 export const OpenAILLM: LLM = {

@@ -15,7 +15,6 @@ export async function evalBuilder(
     filetype = "audio";
   }
 
-  console.log(filetype);
   async function wrapperEval() {
     if (filetype !== "") {
       // @ts-ignore
