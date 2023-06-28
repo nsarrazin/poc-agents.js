@@ -18,9 +18,13 @@ export async function generateCode(
 
   const textAnswer = await llm.call(fullprompt);
 
-  const regex = /```(.*?)```/gs;
-  const matches = [...textAnswer.matchAll(regex)];
+  try {
+    const regex = /```(.*?)```/gs;
+    const matches = [...textAnswer.matchAll(regex)];
 
-  const codeBlocks = matches.map((match) => match[1]);
-  return codeBlocks[0].replace("js\n", "") ?? "nothing";
+    const codeBlocks = matches.map((match) => match[1]);
+    return codeBlocks[0].replace("js\n", "") ?? "nothing";
+  } catch {
+    throw new Error("The generated text doesn't contain any code blocks.");
+  }
 }

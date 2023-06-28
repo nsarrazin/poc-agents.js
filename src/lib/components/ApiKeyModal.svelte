@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { HF_ACCESS_TOKEN, OPENAI_API_KEY } from "$lib/store";
+  import { goto } from "$app/navigation";
 
   let dialogElement: HTMLDialogElement;
 
@@ -21,6 +22,7 @@
     } else {
       localStorage.setItem("HF_ACCESS_TOKEN", $HF_ACCESS_TOKEN);
       localStorage.setItem("OPENAI_API_KEY", $OPENAI_API_KEY);
+      goto("/");
     }
   }}
 >

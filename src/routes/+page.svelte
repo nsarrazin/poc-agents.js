@@ -10,7 +10,6 @@
   import LlmSelector from "$lib/components/LLMSelector.svelte";
   import type { LLM } from "$lib/types";
   import { HFLLM } from "$lib/agents/llm";
-  import { get } from "svelte/store";
   import { OPENAI_API_KEY } from "$lib/store";
 
   let prompt =
@@ -68,7 +67,7 @@
     <h1 class="text-3xl font-semibold w-fit mx-auto">Agents.js</h1>
   </div>
 
-  {#if get(OPENAI_API_KEY) !== ""}
+  {#if $OPENAI_API_KEY !== ""}
     <div class="divider" />
     <LlmSelector bind:llm />
   {/if}
