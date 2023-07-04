@@ -22,7 +22,12 @@ export async function evalBuilder(
     // @ts-ignore
     globalThis["message"] = updateCallback;
 
-    const returnString = "\nreturn await generate(file);";
+    let returnString = "";
+    if (files && files.length > 0) {
+      returnString = "\nreturn await generate(file);";
+    } else {
+      returnString = "\n return await generate();";
+    }
 
     await Object.getPrototypeOf(async function () {}).constructor(
       code + returnString
