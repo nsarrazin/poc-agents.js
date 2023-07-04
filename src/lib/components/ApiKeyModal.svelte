@@ -27,14 +27,21 @@
     }
   }}
 >
-  <form method="dialog" class="modal-box">
-    <h3 class="font-bold text-lg">API keys needed</h3>
-    <div class="w-full flex flex-col gap-5">
+  <form
+    method="dialog"
+    class="modal-box bg-base-300 shadow-xl border-base-content border-2"
+  >
+    <h3 class="font-bold text-xl pb-5">API keys needed</h3>
+    <div class="w-full flex flex-col">
       <form aria-label="HF API" class="form-control">
-        <p class="py-4">
-          In order for this demo to work you need your API token from HF.
-        </p>
-        <label for="hf_key" class="label-text pb-2">HF API token</label>
+        <div>
+          <h3 class="font-bold inline">HF API Token</h3>
+          <span class="inline text-base-content">*</span>
+        </div>
+
+        <label for="hf_key" class="label-text pb-2">
+          In order for this demo to work you need your HF API token.
+        </label>
         <input
           class="input input-primary"
           name="hf_key"
@@ -43,26 +50,29 @@
           bind:value={$HF_ACCESS_TOKEN}
         />
       </form>
+      <div class="divider" />
       <form aria-label="HF ENDPOINT" class="form-control">
-        <label for="hf_endpoint" class="label-text pb-2">HF Endpoint</label>
+        <h3 class="font-bold">HF Inference endpoint</h3>
+        <label for="hf_endpoint" class="label-text pb-2">
+          Optionally you can specify a HF inference endpoint. If you leave this
+          empty the default endpoint will be used.
+        </label>
         <input
-          class="input input-primary"
+          class="input"
           name="hf_endpoint"
           type="text"
-          placeholder="Leave empty to use the default endpoint"
+          placeholder="http://***"
           bind:value={$HF_ENDPOINT}
         />
       </form>
-
-      <div class="divider my-0" />
+      <div class="divider" />
       <form aria-label="OPENAI API" class="form-control">
-        <p class="pb-4">
+        <h3 class="font-bold">OpenAI key</h3>
+        <label for="oai_key" class="label-text pb-2">
           Optionally you can add your OpenAI key to use it as your LLM.
-        </p>
-
-        <label for="oai_key" class="label-text pb-2">OpenAI API key</label>
+        </label>
         <input
-          class="input input-primary"
+          class="input"
           name="oai_key"
           type="text"
           placeholder="sk-***"
@@ -71,7 +81,7 @@
       </form>
     </div>
     <div class="modal-action">
-      <button class="btn">Close</button>
+      <button class="btn btn-neutral w-fit mx-auto">Close</button>
     </div>
   </form>
 </dialog>
