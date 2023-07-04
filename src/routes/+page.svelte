@@ -86,7 +86,7 @@
     bind:value={prompt}
   />
 
-  <!-- <FileUpload bind:files /> -->
+  <FileUpload bind:files />
 
   <button
     class="btn btn-primary mt-auto w-fit mx-auto"
