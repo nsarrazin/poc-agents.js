@@ -11,6 +11,7 @@
   import type { LLM } from "$lib/types";
   import { HFLLM } from "$lib/agents/llm";
   import { OPENAI_API_KEY } from "$lib/store";
+  import ApiKeyModal from "$lib/components/ApiKeyModal.svelte";
 
   let prompt =
     "Draw a picture of a cat wearing a top hat. Then caption the picture and read it out loud.";
@@ -36,14 +37,15 @@
 
   const onRun = async (code: string) => {
     messages = [];
+    const callback = (message: string, data: string | Blob | undefined) => {
+      messages = [...messages, { message, data }];
+    };
 
     const wrapperEval = await evalBuilder(
       code,
       tools.filter((el) => selectedTools.includes(el.name)),
       files,
-      (message, data) => {
-        messages = [...messages, { message, data }];
-      }
+      callback
     );
 
     isLoading = true;
@@ -59,12 +61,21 @@
     }
     isLoading = false;
   };
+
+  let dialogElement: HTMLDialogElement;
 </script>
 
+<ApiKeyModal bind:dialogElement />
+
 <div class="flex flex-col space-y-4 max-w-xl">
-  <div class="flex flex-row justify-around">
+  <div class="flex flex-row">
     <LogoHuggingFaceBorderless classNames="text-4xl" />
-    <h1 class="text-3xl font-semibold w-fit mx-auto">Agents.js</h1>
+    <h1 class="text-3xl font-semibold mx-auto">Agents.js</h1>
+    <button
+      class="btn btn-ghost"
+      on:click={() => dialogElement.showModal()}
+      on:keydown={() => dialogElement.showModal()}>API keys</button
+    >
   </div>
 
   {#if $OPENAI_API_KEY !== ""}

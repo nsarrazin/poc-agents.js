@@ -4,6 +4,5 @@
 </script>
 
 <div class="p-4 max-w-xl mx-auto">
-  <ApiKeyModal />
   <slot />
 </div>

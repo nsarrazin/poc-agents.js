@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { HF_ACCESS_TOKEN, OPENAI_API_KEY } from "$lib/store";
+  import { HF_ACCESS_TOKEN, OPENAI_API_KEY, HF_ENDPOINT } from "$lib/store";
   import { goto } from "$app/navigation";
 
-  let dialogElement: HTMLDialogElement;
+  export let dialogElement: HTMLDialogElement;
 
   onMount(() => {
     if ($HF_ACCESS_TOKEN === "") {
@@ -22,6 +22,7 @@
     } else {
       localStorage.setItem("HF_ACCESS_TOKEN", $HF_ACCESS_TOKEN);
       localStorage.setItem("OPENAI_API_KEY", $OPENAI_API_KEY);
+      localStorage.setItem("HF_ENDPOINT", $HF_ENDPOINT);
       goto("/");
     }
   }}
@@ -42,8 +43,20 @@
           bind:value={$HF_ACCESS_TOKEN}
         />
       </form>
+      <form aria-label="HF ENDPOINT" class="form-control">
+        <label for="hf_endpoint" class="label-text pb-2">HF Endpoint</label>
+        <input
+          class="input input-primary"
+          name="hf_endpoint"
+          type="text"
+          placeholder="Leave empty to use the default endpoint"
+          bind:value={$HF_ENDPOINT}
+        />
+      </form>
+
+      <div class="divider my-0" />
       <form aria-label="OPENAI API" class="form-control">
-        <p class="py-4">
+        <p class="pb-4">
           Optionally you can add your OpenAI key to use it as your LLM.
         </p>
 
