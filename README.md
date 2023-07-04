@@ -1,3 +1,10 @@
+---
+title: Agents.js PoC
+emoji: 🤖
+colorFrom: yellow
+colorTo: orange
+---
+
 # Agents.JS - Proof of concept
 
 ### Demo on a space
