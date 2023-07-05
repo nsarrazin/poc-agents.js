@@ -1,29 +1,44 @@
 <script lang="ts">
-  export let codePromise: Promise<string>;
+  export let code: string;
   export let onRun: (code: string) => void;
+
+  let editMode: boolean = false;
+  let codeElement: HTMLElement;
 </script>
 
 <div class="divider" />
-<h3 class="text-lg">Check the code</h3>
-
-{#await codePromise}
-  <div class="loading loading-lg mx-auto" />
-{:then code}
-  <div class="mockup-code text-sm">
-    <pre class="ml-4"><code>{code}</code></pre>
-  </div>
-
+<div>
+  <h3 class="text-lg inline-block">Check the code</h3>
   <button
-    class="btn btn-primary w-fit mx-auto"
-    on:click={() => {
-      onRun(code);
-    }}
+    class="btn btn-ghost inline-block w-min"
+    on:click={() => (editMode = !editMode)}
+    on:keypress={() => (editMode = !editMode)}
   >
-    run code
+    {editMode ? "done" : "edit"}
   </button>
-{:catch error}
-  <div class="alert alert-error mx-auto">
-    <p class="font-bold">Error</p>
-    <p>{error.message}</p>
-  </div>
-{/await}
+</div>
+<div
+  class="mockup-code text-sm focus:outline-none"
+  class:bg-base-200={editMode}
+  on:dblclick={() => (editMode = true)}
+>
+  <pre
+    class="ml-4"
+    on:click={() => codeElement && codeElement.focus()}
+    on:keypress={() => codeElement && codeElement.focus()}>
+  {#if editMode}
+      <code contenteditable bind:textContent={code} bind:this={codeElement} />
+    {:else}
+      <code>{code}</code>
+    {/if}
+    </pre>
+</div>
+
+<button
+  class="btn btn-primary w-fit mx-auto"
+  on:click={() => {
+    onRun(code);
+  }}
+>
+  run code
+</button>

@@ -19,6 +19,7 @@
   let llm: LLM = HFLLM;
 
   let codePromise: Promise<string> | null = null;
+  let code: string = "";
   let messages: Array<{ message: string; data: string | Blob | undefined }> =
     [];
 
@@ -33,6 +34,7 @@
       files,
       llm
     );
+    code = await codePromise;
   };
 
   const onRun = async (code: string) => {
@@ -106,9 +108,18 @@
     disabled={selectedTools.length === 0}>generate</button
   >
 
-  {#if codePromise}
-    <CodePreview bind:codePromise {onRun} />
-  {/if}
+  {#await codePromise}
+    <div class="loading loading-lg mx-auto" />
+  {:then}
+    {#if code !== ""}
+      <CodePreview bind:code {onRun} />
+    {/if}
+  {:catch error}
+    <div class="alert alert-error mx-auto">
+      <p class="font-bold">Error</p>
+      <p>{error.message}</p>
+    </div>
+  {/await}
 
   <div class="divider" />
 
