@@ -17,3 +17,10 @@ export type Update = {
   message: string;
   data: undefined | string | Blob;
 };
+
+export type Example = {
+  prompt: string;
+  code: string;
+  tools: string[];
+  input?: "audio" | "image" | "document";
+};

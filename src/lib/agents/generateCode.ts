@@ -23,7 +23,10 @@ export async function generateCode(
     const matches = [...textAnswer.matchAll(regex)];
 
     const codeBlocks = matches.map((match) => match[1]);
-    return codeBlocks[0].replace("js\n", "") ?? "nothing";
+    return (
+      codeBlocks[0].replace("js", "").replace("javascript", "").trim() ??
+      "nothing"
+    );
   } catch {
     throw new Error("The generated text doesn't contain any code blocks.");
   }
