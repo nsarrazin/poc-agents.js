@@ -1,66 +1,65 @@
 <script lang="ts">
   import LogoHuggingFaceBorderless from "$lib/components/LogoHuggingFaceBorderless.svelte";
-  import { generateCode } from "$lib/agents/generateCode";
-  import { tools } from "$lib/agents/tools";
-  import { evalBuilder } from "$lib/agents/evalBuilder";
   import FileUpload from "$lib/components/FileUpload.svelte";
   import ToolSelector from "$lib/components/ToolSelector.svelte";
   import CodePreview from "$lib/components/CodePreview.svelte";
   import ResultsDisplay from "$lib/components/ResultsDisplay.svelte";
   import LlmSelector from "$lib/components/LLMSelector.svelte";
-  import type { LLM } from "$lib/types";
-  import { HFLLM } from "$lib/agents/llm";
-  import { OPENAI_API_KEY } from "$lib/store";
+  import { HF_ACCESS_TOKEN, HF_ENDPOINT, OPENAI_API_KEY } from "$lib/store";
   import ApiKeyModal from "$lib/components/ApiKeyModal.svelte";
+  import { HfAgent, LLMFromEndpoint, defaultTools } from "@huggingface/agents";
+  import { LLMFromHub } from "@huggingface/agents";
+  import { LLMFromOpenAI } from "$lib/LLMFromOpenAI";
 
   let prompt =
-    "Draw a picture of a cat wearing a top hat. Then caption the picture and read it out loud.";
+    "Draw a picture of a cat wearing a top hat and display it. Then caption the picture and read it out loud.";
   let selectedTools: Array<string> = [];
-  let llm: LLM = HFLLM;
+
+  let llm: "hf" | "openai" = "hf";
 
   let codePromise: Promise<string> | null = null;
   let code: string = "";
   let messages: Array<{ message: string; data: string | Blob | undefined }> =
     [];
 
-  let files: FileList | null = null;
+  let files: FileList | undefined;
 
   let isLoading = false;
+
+  const getLLM = () => {
+    if (llm === "hf") {
+      return $HF_ENDPOINT
+        ? LLMFromEndpoint($HF_ACCESS_TOKEN, $HF_ENDPOINT)
+        : LLMFromHub($HF_ACCESS_TOKEN);
+    } else if (llm === "openai") {
+      return LLMFromOpenAI($OPENAI_API_KEY);
+    }
+  };
+
   const onGenerate = async () => {
-    messages = [];
-    codePromise = generateCode(
-      prompt,
-      tools.filter((el) => selectedTools.includes(el.name)),
-      files,
-      llm
+    const agent = new HfAgent(
+      $HF_ACCESS_TOKEN,
+      getLLM(),
+      defaultTools.filter((el) => selectedTools.includes(el.name))
     );
+
+    messages = [];
+
+    codePromise = agent.generateCode(prompt, files);
     code = await codePromise;
   };
 
   const onRun = async (code: string) => {
+    isLoading = true;
     messages = [];
-    const callback = (message: string, data: string | Blob | undefined) => {
-      messages = [...messages, { message, data }];
-    };
 
-    const wrapperEval = await evalBuilder(
-      code,
-      tools.filter((el) => selectedTools.includes(el.name)),
-      files,
-      callback
+    const agent = new HfAgent(
+      $HF_ACCESS_TOKEN,
+      getLLM(),
+      defaultTools.filter((el) => selectedTools.includes(el.name))
     );
 
-    isLoading = true;
-    try {
-      await wrapperEval();
-    } catch (e) {
-      if (e instanceof Error) {
-        messages = [
-          ...messages,
-          { message: "An error occurred", data: e.message },
-        ];
-      }
-    }
+    messages = await agent.evaluateCode(code, files);
     isLoading = false;
   };
 

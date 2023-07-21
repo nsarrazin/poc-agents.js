@@ -1,25 +1,34 @@
 <script lang="ts">
-  import type { LLM } from "$lib/types";
-  import { LLMs } from "$lib/agents/llm";
-  export let llm: LLM;
+  export let llm: "openai" | "hf";
 </script>
 
 <h3 class="text-lg">Select your LLM</h3>
 
 <div class="join mx-auto gap-5">
-  {#each LLMs as llmOption}
-    <label
-      class="label cursor-pointer"
-      on:click={() => (llm = llmOption)}
-      on:keypress={() => (llm = llmOption)}
-    >
-      <span class="label-text pr-2">{llmOption.name}</span>
-      <input
-        type="radio"
-        name="radio-10"
-        class="radio checked:bg-primary-500"
-        checked
-      />
-    </label>
-  {/each}
+  <label
+    class="label cursor-pointer"
+    on:click={() => (llm = "openai")}
+    on:keypress={() => (llm = "openai")}
+  >
+    <span class="label-text pr-2">OpenAI</span>
+    <input
+      type="radio"
+      name="radio-10"
+      class="radio checked:bg-primary-500"
+      checked
+    />
+  </label>
+  <label
+    class="label cursor-pointer"
+    on:click={() => (llm = "hf")}
+    on:keypress={() => (llm = "hf")}
+  >
+    <span class="label-text pr-2">Hugging Face</span>
+    <input
+      type="radio"
+      name="radio-10"
+      class="radio checked:bg-primary-500"
+      checked
+    />
+  </label>
 </div>

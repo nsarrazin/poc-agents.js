@@ -1,5 +1,4 @@
 <script>
-  import ApiKeyModal from "$lib/components/ApiKeyModal.svelte";
   import "../app.css";
 </script>
 
