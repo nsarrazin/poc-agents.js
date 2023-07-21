@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tools } from "$lib/agents/tools";
+  import { defaultTools } from "@huggingface/agents";
   export let selectedTools: Array<string> = [];
 </script>
 
@@ -7,7 +7,7 @@
   <h3 class="text-lg">Select your tools</h3>
 
   <div class="join mx-auto grid grid-cols-4 gap-3">
-    {#each tools as tool}
+    {#each defaultTools as tool}
       <label class="label cursor-pointer gap-2">
         <span class="label-text">
           {tool.name}
@@ -24,7 +24,7 @@
   </div>
 
   <div class="mx-auto w-fit mt-2">
-    {#if selectedTools.length === tools.length}
+    {#if selectedTools.length === defaultTools.length}
       <button
         class="btn btn-ghost inline-block w-fit btn-sm"
         on:click={() => (selectedTools = [])}>clear</button
@@ -32,7 +32,7 @@
     {:else}
       <button
         class="btn btn-ghost inline-block w-fit btn-sm"
-        on:click={() => (selectedTools = tools.map((el) => el.name))}
+        on:click={() => (selectedTools = defaultTools.map((el) => el.name))}
         >select all</button
       >
     {/if}
