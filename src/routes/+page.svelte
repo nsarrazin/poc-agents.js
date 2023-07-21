@@ -12,7 +12,7 @@
   import { LLMFromOpenAI } from "$lib/LLMFromOpenAI";
 
   let prompt =
-    "Draw a picture of a cat wearing a top hat. Then caption the picture and read it out loud.";
+    "Draw a picture of a cat wearing a top hat and display it. Then caption the picture and read it out loud.";
   let selectedTools: Array<string> = [];
 
   let llm: "hf" | "openai" = "hf";
