@@ -4,7 +4,7 @@
 </script>
 
 <div class="w-fit mx-auto">
-  <h3 class="text-lg">Select your tools</h3>
+  <h3 class="text-lg pb-3">Select your tools</h3>
 
   <div class="join mx-auto grid grid-cols-4 gap-3">
     {#each defaultTools as tool}
