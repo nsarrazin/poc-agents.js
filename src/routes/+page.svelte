@@ -76,7 +76,7 @@
 
 <ApiKeyModal bind:dialogElement />
 
-<div class="flex flex-col space-y-4 max-w-xl">
+<div class="flex flex-col space-y-4 max-w-2xl">
   <div class="flex flex-row">
     <LogoHuggingFaceBorderless classNames="text-4xl" />
     <h1 class="text-3xl font-semibold mx-auto">Agents.js</h1>

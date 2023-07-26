@@ -2,6 +2,6 @@
   import "../app.css";
 </script>
 
-<div class="p-4 max-w-xl mx-auto">
+<div class="p-4 max-w-2xl mx-auto">
   <slot />
 </div>

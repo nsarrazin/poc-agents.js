@@ -4,12 +4,6 @@
   import { goto } from "$app/navigation";
 
   export let dialogElement: HTMLDialogElement;
-
-  onMount(() => {
-    if ($HF_ACCESS_TOKEN === "") {
-      dialogElement.showModal();
-    }
-  });
 </script>
 
 <dialog
