@@ -1,7 +1,7 @@
 # Agents.JS - Proof of concept
 
 ### Demo on a space
-https://nsarrazin-poc-agents-js.hf.space
+[https://nsarrazin-poc-agents-js.hf.space](https://nsarrazin-agents-js-oasst.hf.space/)
 
 ### Run locally
 To run it, make sure you have both a [huggingface token](https://huggingface.co/settings/tokens) and an [OpenAI API key](https://platform.openai.com/account/api-keys), and then run:
