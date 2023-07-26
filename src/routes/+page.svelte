@@ -42,15 +42,16 @@
         filetypes,
       }),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Something went wrong with the code generation.");
+        }
+        return res.json();
+      })
       .then((res) => {
         code = res;
         return res;
       });
-
-    if (codePromise === null) {
-      return;
-    }
 
     code = await codePromise;
   };

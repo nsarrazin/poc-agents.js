@@ -1,4 +1,4 @@
-import { json } from "@sveltejs/kit";
+import { error, json } from "@sveltejs/kit";
 import {
   defaultTools,
   HfAgent,
@@ -29,7 +29,12 @@ export async function POST({ request }) {
       }))
     : undefined;
 
-  const code = await agent.generateCode(prompt, files);
+  let code = "";
+  try {
+    code = await agent.generateCode(prompt, files);
+  } catch (e) {
+    throw error(500, e as Error);
+  }
 
   return json(code);
 }
