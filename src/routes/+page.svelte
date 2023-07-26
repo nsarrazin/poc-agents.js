@@ -4,16 +4,14 @@
   import ToolSelector from "$lib/components/ToolSelector.svelte";
   import CodePreview from "$lib/components/CodePreview.svelte";
   import ResultsDisplay from "$lib/components/ResultsDisplay.svelte";
-  import LlmSelector from "$lib/components/LLMSelector.svelte";
-  import { HF_ACCESS_TOKEN, HF_ENDPOINT, OPENAI_API_KEY } from "$lib/store";
+  import { HfAgent, LLMFromHub, defaultTools } from "@huggingface/agents";
+  import { PUBLIC_MODEL_NAME, PUBLIC_MODEL_URL } from "$env/static/public";
   import ApiKeyModal from "$lib/components/ApiKeyModal.svelte";
-  import { HfAgent, LLMFromEndpoint, defaultTools } from "@huggingface/agents";
-  import { LLMFromHub } from "@huggingface/agents";
-  import { LLMFromOpenAI } from "$lib/LLMFromOpenAI";
+  import { HF_ACCESS_TOKEN } from "$lib/store";
 
   let prompt =
     "Draw a picture of a cat wearing a top hat and display it. Then caption the picture and read it out loud.";
-  let selectedTools: Array<string> = [];
+  let selectedTools: Array<string> = defaultTools.map((el) => el.name);
 
   let llm: "hf" | "openai" = "hf";
 
@@ -26,26 +24,34 @@
 
   let isLoading = false;
 
-  const getLLM = () => {
-    if (llm === "hf") {
-      return $HF_ENDPOINT
-        ? LLMFromEndpoint($HF_ACCESS_TOKEN, $HF_ENDPOINT)
-        : LLMFromHub($HF_ACCESS_TOKEN);
-    } else if (llm === "openai") {
-      return LLMFromOpenAI($OPENAI_API_KEY);
-    }
-  };
-
   const onGenerate = async () => {
-    const agent = new HfAgent(
-      $HF_ACCESS_TOKEN,
-      getLLM(),
-      defaultTools.filter((el) => selectedTools.includes(el.name))
-    );
-
     messages = [];
 
-    codePromise = agent.generateCode(prompt, files);
+    const filetypes = files
+      ? Array.from(files).map((el) => el?.type)
+      : undefined;
+
+    codePromise = fetch("/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt,
+        tools: selectedTools,
+        filetypes,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        code = res;
+        return res;
+      });
+
+    if (codePromise === null) {
+      return;
+    }
+
     code = await codePromise;
   };
 
@@ -54,12 +60,13 @@
     messages = [];
 
     const agent = new HfAgent(
-      $HF_ACCESS_TOKEN,
-      getLLM(),
+      $HF_ACCESS_TOKEN ?? "",
+      undefined,
       defaultTools.filter((el) => selectedTools.includes(el.name))
     );
 
     messages = await agent.evaluateCode(code, files);
+    window.scrollTo(0, document.body.scrollHeight);
     isLoading = false;
   };
 
@@ -77,12 +84,17 @@
       on:click={() => dialogElement.showModal()}
       on:keydown={() => dialogElement.showModal()}>API keys</button
     >
+    <div />
   </div>
-
-  {#if $OPENAI_API_KEY !== ""}
-    <div class="divider" />
-    <LlmSelector bind:llm />
-  {/if}
+  <p class="text-justify">
+    This demo is meant to showcase some of the features that we released with <a
+      class="link"
+      href="https://huggingface.co/blog/agents-js">agents.js</a
+    >. This demo is using
+    <a class="font-bold link-hover" href={PUBLIC_MODEL_URL}
+      >{PUBLIC_MODEL_NAME}</a
+    >.
+  </p>
 
   <div class="divider" />
 
@@ -90,7 +102,7 @@
 
   <div class="divider" />
 
-  <span class="label-text text-lg"> Input your request </span>
+  <span class="label-text text-lg pb-3"> Input your request </span>
 
   <textarea
     class="textarea border-base-300 bg-base-300"
@@ -120,11 +132,13 @@
     </div>
   {/await}
 
-  <div class="divider" />
-
-  <ResultsDisplay bind:messages />
-
+  {#if messages.length !== 0}
+    <div class="divider" />
+    <ResultsDisplay bind:messages />
+  {/if}
   {#if isLoading}
+    <div class="divider" />
+
     <div class="loading loading-lg mx-auto" />
   {/if}
 </div>
