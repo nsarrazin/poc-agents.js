@@ -1,12 +1,11 @@
 <script lang="ts">
+  import type { Data } from "../../app";
+  import DataDisplay from "./DataDisplay.svelte";
+
   export let messages: Array<{
     message: string;
-    data: string | Blob | undefined;
+    data: Data | Array<Data>;
   }>;
-
-  const isBlob = (message: string | Blob): message is Blob => {
-    return message instanceof Blob;
-  };
 </script>
 
 <div class="w-fit mx-auto">
@@ -19,23 +18,7 @@
           {message.message}
         </div>
         <div class="collapse-content">
-          {#if !!message.data && isBlob(message.data)}
-            {#if message.data.type.startsWith("image")}
-              <div class="mx-auto border-2 border-neutral-focus w-full">
-                <img
-                  class="p-1 w-fit"
-                  alt="generated"
-                  src={URL.createObjectURL(message.data)}
-                />
-              </div>
-            {:else if message.data.type.startsWith("audio")}
-              <audio controls src={URL.createObjectURL(message.data)} />
-            {:else}
-              <p class="text-mono text-light w-full">blob type unknown</p>
-            {/if}
-          {:else if !!message.data}
-            <p class="text-mono mx-auto text-light w-full">{message.data}</p>
-          {/if}
+          <DataDisplay data={message.data} />
         </div>
       </div>
     {/each}
