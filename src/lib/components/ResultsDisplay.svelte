@@ -2,9 +2,12 @@
   import type { Data } from "../../app";
   import DataDisplay from "./DataDisplay.svelte";
 
-  export let messages: Array<{
-    message: string;
-    data: Data | Array<Data>;
+  let messages: Array<{
+    from: "user" | "assistant";
+    content: string;
+    scratchpad?: Message[];
+    image?: Blob;
+    audio?: Blob;
   }>;
 </script>
 
@@ -15,10 +18,10 @@
       <div class="collapse bg-base-200 collapse-plus">
         <input type="checkbox" />
         <div class="collapse-title text-xl font-medium">
-          {message.message}
+          {message.content}
         </div>
         <div class="collapse-content">
-          <DataDisplay data={message.data} />
+          <DataDisplay data={message.image} />
         </div>
       </div>
     {/each}

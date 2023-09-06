@@ -2,76 +2,59 @@
   import LogoHuggingFaceBorderless from "$lib/components/LogoHuggingFaceBorderless.svelte";
   import FileUpload from "$lib/components/FileUpload.svelte";
   import ToolSelector from "$lib/components/ToolSelector.svelte";
-  import CodePreview from "$lib/components/CodePreview.svelte";
-  import ResultsDisplay from "$lib/components/ResultsDisplay.svelte";
-  import { HfAgent, LLMFromHub, defaultTools } from "@huggingface/agents";
+  import {
+    HfChatAgent,
+    defaultTools,
+    templateLlama2,
+  } from "@huggingface/agents";
   import { PUBLIC_MODEL_NAME, PUBLIC_MODEL_URL } from "$env/static/public";
   import ApiKeyModal from "$lib/components/ApiKeyModal.svelte";
-  import { HF_ACCESS_TOKEN } from "$lib/store";
+  import { LLMFromServer } from "$lib/LLMFromServer";
+  import type { Chat, Tool } from "@huggingface/agents/src/types";
+  import Markdown from "@magidoc/plugin-svelte-marked";
+  import DataDisplay from "$lib/components/DataDisplay.svelte";
+  import { webSearch } from "$lib/WebSearchTool";
+
+  const tools = [...defaultTools, webSearch];
 
   let prompt =
     "Draw a picture of a cat wearing a top hat and display it. Then caption the picture and read it out loud.";
-  let selectedTools: Array<string> = defaultTools.map((el) => el.name);
-
-  let llm: "hf" | "openai" = "hf";
-
-  let codePromise: Promise<string> | null = null;
-  let code: string = "";
-  let messages: Array<{ message: string; data: string | Blob | undefined }> =
-    [];
+  let selectedTools: Array<string> = tools.map((el) => el.name);
 
   let files: FileList | undefined;
 
-  let isLoading = false;
+  let messages: Chat = [];
+
+  let agent = new HfChatAgent({
+    llm: LLMFromServer(),
+    chatFormat: templateLlama2,
+    updateCallback: (newMessages) => {
+      messages = [...newMessages];
+    },
+  });
 
   const onGenerate = async () => {
-    messages = [];
-
-    const filetypes = files
-      ? Array.from(files).map((el) => el?.type)
-      : undefined;
-
-    codePromise = fetch("/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        prompt,
-        tools: selectedTools,
-        filetypes,
-      }),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Something went wrong with the code generation.");
-        }
-        return res.json();
-      })
-      .then((res) => {
-        code = res;
-        return res;
-      });
-
-    code = await codePromise;
-  };
-
-  const onRun = async (code: string) => {
-    isLoading = true;
-    messages = [];
-
-    const agent = new HfAgent(
-      $HF_ACCESS_TOKEN ?? "",
-      undefined,
-      defaultTools.filter((el) => selectedTools.includes(el.name))
-    );
-
-    messages = await agent.evaluateCode(code, files);
-    window.scrollTo(0, document.body.scrollHeight);
-    isLoading = false;
+    agent.chat(prompt, files);
   };
 
   let dialogElement: HTMLDialogElement;
+
+  $: selectedTools,
+    ((agent = new HfChatAgent({
+      llm: LLMFromServer(),
+      chatFormat: templateLlama2,
+      updateCallback: (newMessages) => {
+        messages = [...newMessages];
+      },
+      tools: selectedTools
+        .map((tool) => {
+          return tools.find((el) => el.name === tool);
+        })
+        .filter((el) => el !== undefined) as Array<Tool>,
+    })),
+    (messages = []));
+
+  const regex = /\[\[.*?\]\]/g;
 </script>
 
 <ApiKeyModal bind:dialogElement />
@@ -120,26 +103,59 @@
     disabled={selectedTools.length === 0}>generate</button
   >
 
-  {#await codePromise}
-    <div class="loading loading-lg mx-auto" />
-  {:then}
-    {#if code !== ""}
-      <CodePreview bind:code {onRun} />
-    {/if}
-  {:catch error}
-    <div class="alert alert-error mx-auto">
-      <p class="font-bold">Error</p>
-      <p>{error.message}</p>
-    </div>
-  {/await}
+  <div class="divider" />
 
-  {#if messages.length !== 0}
-    <div class="divider" />
-    <ResultsDisplay bind:messages />
-  {/if}
-  {#if isLoading}
-    <div class="divider" />
+  <div class="w-full flex-col flex gap-5">
+    {#each messages as message}
+      <div
+        class="chat chat-bubble max-w-xl mx-auto"
+        class:chat-start={message.from === "assistant"}
+        class:chat-end={message.from === "user"}
+        class:chat-bubble-info={message.from === "assistant"}
+      >
+        {message.content}
+      </div>
+      {#if message.scratchpad}
+        {@const isDone = message.scratchpad.updates.find(
+          (el) => typeof el.body === "string" && el.body.startsWith("Final")
+        )}
 
-    <div class="loading loading-lg mx-auto" />
-  {/if}
+        <div class="collapse bg-base-200">
+          <input type="checkbox" />
+          <div class="collapse-title text-xl font-medium">
+            Scratchpad
+            {#if !isDone}
+              <span class="ml-5 loading loading-dots loading-sm" />
+            {/if}
+          </div>
+          <div class="collapse-content">
+            <ul>
+              {#each message.scratchpad.updates as scratch}
+                <li>
+                  <span class="font-bold">{scratch.type}</span>
+                  {#if typeof scratch.body !== "boolean"}
+                    <DataDisplay data={scratch.body} />
+                  {/if}
+                </li>
+                <div class="divider" />
+              {/each}
+            </ul>
+          </div>
+        </div>
+
+        {#if isDone}
+          <!-- display the images in a grid -->
+          <div class="divider" />
+          <div class="grid grid-cols-2 gap-4">
+            {#each Object.keys(message.scratchpad.files) as name}
+              {@const file = message.scratchpad.files[name]}
+              {#if name.startsWith("tool")}
+                <DataDisplay data={file} />
+              {/if}
+            {/each}
+          </div>
+        {/if}
+      {/if}
+    {/each}
+  </div>
 </div>
