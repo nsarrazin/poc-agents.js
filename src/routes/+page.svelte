@@ -17,8 +17,7 @@
 
   const tools = [...defaultTools, webSearch];
 
-  let prompt =
-    "Draw a picture of a cat wearing a top hat and display it. Then caption the picture and read it out loud.";
+  let prompt = "Draw the current president of Ireland.";
   let selectedTools: Array<string> = tools.map((el) => el.name);
 
   let files: FileList | undefined;
