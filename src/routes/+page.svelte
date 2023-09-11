@@ -17,7 +17,7 @@
 
   const tools = [...defaultTools, webSearch];
 
-  let prompt = "Draw the current president of Ireland.";
+  let prompt = "Generate an image of the current Prime Minister of the UK.";
   let selectedTools: Array<string> = tools.map((el) => el.name);
 
   let files: FileList | undefined;
@@ -149,7 +149,7 @@
             {#each Object.keys(message.scratchpad.files) as name}
               {@const file = message.scratchpad.files[name]}
               {#if name.startsWith("tool")}
-                <DataDisplay data={file} />
+                <DataDisplay data={file.file} />
               {/if}
             {/each}
           </div>
